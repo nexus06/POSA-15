@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 
 /**
  * An Activity that downloads an image, stores it in a local file on
@@ -27,14 +28,45 @@ public class DownloadImageActivity extends Activity {
         // Always call super class for necessary
         // initialization/implementation.
         // @@ TODO -- you fill in here.
+    	super.onCreate(savedInstanceState);
 
         // Get the URL associated with the Intent data.
         // @@ TODO -- you fill in here.
+    	final Uri uri = getIntent().getData();
 
         // Download the image in the background, create an Intent that
         // contains the path to the image file, and set this as the
         // result of the Activity.
-
+    	Runnable downLoadRunable = new Runnable() {
+			
+			@Override
+			public void run() {
+				//init intent
+				Intent downLoadIntent = new Intent();
+				
+				//set uri representing imagePath to imageUri using utils class provided
+				Uri imageUri = DownloadUtils.downloadImage(DownloadImageActivity.this, uri);
+				
+				//set the location of the image
+				downLoadIntent.setData(imageUri);
+				
+				//set result ok
+				setResult(RESULT_OK, downLoadIntent);
+				
+				Runnable postOnUi = new Runnable() {
+					
+					@Override
+					public void run() {
+						finish();
+					}
+				};
+				runOnUiThread(postOnUi);
+			}
+		};
+		
+		Thread downloadThread = new Thread(downLoadRunable);
+		downloadThread.start();
+		
         // @@ TODO -- you fill in here using the Android "HaMeR"
         // concurrency framework.  Note that the finish() method
         // should be called in the UI thread, whereas the other

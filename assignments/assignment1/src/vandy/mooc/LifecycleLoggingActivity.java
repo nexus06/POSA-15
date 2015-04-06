@@ -57,6 +57,7 @@ public abstract class LifecycleLoggingActivity extends Activity {
         // Always call super class for necessary
         // initialization/implementation.
         // TODO - you fill in here.
+    	super.onStart();
     }
 	
     /**
@@ -74,6 +75,8 @@ public abstract class LifecycleLoggingActivity extends Activity {
         // initialization/implementation and then log which lifecycle
         // hook method is being called.
         // TODO - you fill in here.
+    	super.onResume();
+    	Log.i(TAG, "Called onResume() method");
     }
 	
     /**
@@ -90,6 +93,8 @@ public abstract class LifecycleLoggingActivity extends Activity {
         // initialization/implementation and then log which lifecycle
         // hook method is being called.
         // TODO - you fill in here.
+    	super.onPause();
+    	Log.i(TAG, "Called onPause() method");
     }
 	
     /**
@@ -103,6 +108,8 @@ public abstract class LifecycleLoggingActivity extends Activity {
         // initialization/implementation and then log which lifecycle
         // hook method is being called.
         // TODO - you fill in here.
+    	super.onStop();
+    	Log.i(TAG, "Called onStop() method");
     }
 	
     /**
@@ -115,6 +122,9 @@ public abstract class LifecycleLoggingActivity extends Activity {
         // initialization/implementation and then log which lifecycle
         // hook method is being called.
         // TODO - you fill in here.
+    	super.onRestart();
+    	Log.i(TAG, "Called onRestart() method");
+    	
     }
 	
     /**
@@ -128,5 +138,7 @@ public abstract class LifecycleLoggingActivity extends Activity {
         // initialization/implementation and then log which lifecycle
         // hook method is being called.
         // TODO - you fill in here.
+    	super.onDestroy();
+    	Log.i(TAG, "Called onDestroy() method");
     }
 }
