@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 
 /**
  * An Activity that downloads an image, stores it in a local file on
@@ -34,25 +35,46 @@ public class DownloadImageActivity extends Activity {
         // @@ TODO -- you fill in here.
     	final Uri uri = getIntent().getData();
 
-        // Download the image in the background, create an Intent that
-        // contains the path to the image file, and set this as the
+        
+    	
+    	
+    	
+    	 // @@ TODO -- you fill in here using the Android "HaMeR"
+        // concurrency framework.  Note that the finish() method
+        // should be called in the UI thread, whereas the other
+        // methods should be called in the background thread.  See
+        // http://stackoverflow.com/questions/20412871/is-it-safe-to-finish-an-android-activity-from-a-background-thread
+        // for more discussion about this topic.
+    	
+    	//handler attached to the UI thread
+    	final Handler uiHandler = new Handler(Looper.getMainLooper());
+    	
+    	// Download the image in the background, and set this as the
         // result of the Activity.
-    	Runnable downLoadRunable = new Runnable() {
+    	Runnable downLoadRunnable = new Runnable() {
 			
 			@Override
 			public void run() {
-				//init intent
+				
+				//create an Intent that contains the path to the image file
 				Intent downLoadIntent = new Intent();
 				
 				//set uri representing imagePath to imageUri using utils class provided
+				//this method return null if catch an error so we don't have to manage error here
 				Uri imageUri = DownloadUtils.downloadImage(DownloadImageActivity.this, uri);
 				
 				//set the location of the image
 				downLoadIntent.setData(imageUri);
 				
-				//set result ok
-				setResult(RESULT_OK, downLoadIntent);
+				//set result
+				if (imageUri !=null){
+					setResult(RESULT_OK, downLoadIntent);	
+				}else{
+					setResult(RESULT_CANCELED, downLoadIntent);	
+				}
 				
+				
+				//this runnable will finish the activity
 				Runnable postOnUi = new Runnable() {
 					
 					@Override
@@ -60,18 +82,15 @@ public class DownloadImageActivity extends Activity {
 						finish();
 					}
 				};
-				runOnUiThread(postOnUi);
+				uiHandler.post(postOnUi);
+				//also we can call runOnUiThread(postOnUi) what it is the common way, but as exercise we are using a handler attached to UI
+			
 			}
 		};
 		
-		Thread downloadThread = new Thread(downLoadRunable);
+		Thread downloadThread = new Thread(downLoadRunnable);
 		downloadThread.start();
 		
-        // @@ TODO -- you fill in here using the Android "HaMeR"
-        // concurrency framework.  Note that the finish() method
-        // should be called in the UI thread, whereas the other
-        // methods should be called in the background thread.  See
-        // http://stackoverflow.com/questions/20412871/is-it-safe-to-finish-an-android-activity-from-a-background-thread
-        // for more discussion about this topic.
+       
     }
 }
