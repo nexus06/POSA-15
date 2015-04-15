@@ -1,7 +1,5 @@
 package vandy.mooc;
 
-import java.io.File;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -9,12 +7,13 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
-import android.util.Patterns;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.URLUtil;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import java.io.File;
 
 /**
  * A main Activity that prompts the user for a URL to an image and
@@ -54,18 +53,18 @@ public class MainActivity extends LifecycleLoggingActivity {
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "*** onCreate() ***");
         // Always call super class for necessary
         // initialization/implementation.
         // @@ TODO -- you fill in here.
-    	super.onCreate(savedInstanceState);
+        super.onCreate(savedInstanceState);
         // Set the default layout.
         // @@ TODO -- you fill in here.
-    	setContentView(R.layout.main_activity);
-
+        setContentView(R.layout.main_activity);
         // Cache the EditText that holds the urls entered by the user
         // (if any).
         // @@ TODO -- you fill in here.
-    	mUrlEditText = (EditText) findViewById(R.id.url);
+        mUrlEditText = (EditText) findViewById(R.id.url);
     }
 
     /**
@@ -75,6 +74,7 @@ public class MainActivity extends LifecycleLoggingActivity {
      * @param view The view.
      */
     public void downloadImage(View view) {
+        Log.d(TAG, "*** downloadImage() ***");
         try {
             // Hide the keyboard.
             hideKeyboard(this,
@@ -86,14 +86,13 @@ public class MainActivity extends LifecycleLoggingActivity {
             // it's an Intent that's implemented by the
             // DownloadImageActivity.
             // @@ TODO - you fill in here.
-            Intent downLoadIntent = makeDownloadImageIntent(getUrl());
-
+            Intent download = makeDownloadImageIntent(getUrl());
             // Start the Activity associated with the Intent, which
             // will download the image and then return the Uri for the
             // downloaded image file via the onActivityResult() hook
             // method.
             // @@ TODO -- you fill in here.
-            startActivityForResult(downLoadIntent, DOWNLOAD_IMAGE_REQUEST);
+            startActivityForResult(download, DOWNLOAD_IMAGE_REQUEST);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -112,7 +111,7 @@ public class MainActivity extends LifecycleLoggingActivity {
         // Check if the started Activity completed successfully.
         // @@ TODO -- you fill in here, replacing true with the right
         // code.
-        if (resultCode == RESULT_OK && data.getData()!=null) {
+        if (resultCode == Activity.RESULT_OK) {
             // Check if the request code is what we're expecting.
             // @@ TODO -- you fill in here, replacing true with the
             // right code.
@@ -122,10 +121,10 @@ public class MainActivity extends LifecycleLoggingActivity {
                 // by passing in the path to the downloaded image
                 // file.
                 // @@ TODO -- you fill in here.
-            	Intent galeryIntent = makeGalleryIntent(data.getData().getPath());
+                Intent gallery = makeGalleryIntent(data.getData().toString());
                 // Start the Gallery Activity.
                 // @@ TODO -- you fill in here.
-            	startActivity(galeryIntent);
+                startActivity(gallery);
             }
         }
         // Check if the started Activity did not complete successfully
@@ -133,69 +132,64 @@ public class MainActivity extends LifecycleLoggingActivity {
         // download contents at the given URL.
         // @@ TODO -- you fill in here, replacing true with the right
         // code.
-        else if (resultCode == RESULT_CANCELED || data.getData()==null) {
-        	  Toast.makeText(this,"problem occurred when trying to"+
-      			  	" download contents at the given URL",
-                      Toast.LENGTH_LONG).show();
+        else if (resultCode == Activity.RESULT_CANCELED) {
+            Toast.makeText(this,
+                    "An error occurred when trying to download the image....",
+                    Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "An error occurred when trying to download the image....");
         }
     }    
 
     /**
-     * Factory method that returns an implicit Intent for viewing the
+     * Factory method that returns an Intent for viewing the
      * downloaded image in the Gallery app.
      */
     private Intent makeGalleryIntent(String pathToImageFile) {
+        Log.d(TAG, "*** makeGalleryIntent() ***" + pathToImageFile);
         // Create an intent that will start the Gallery app to view
         // the image.
     	// TODO -- you fill in here, replacing "null" with the proper
     	// code.
-    	Intent intent = new Intent(Intent.ACTION_VIEW); 
-    	intent.setDataAndType(Uri.fromFile(new File(pathToImageFile)),"image/*"); 
-    	return intent;
+        Intent gallery = new Intent(Intent.ACTION_VIEW);
+
+        Uri imageData = Uri.fromFile(new File(pathToImageFile));
+        gallery.setDataAndType(imageData, "image/*");
+
+        return gallery;
     }
 
     /**
-     * Factory method that returns an implicit Intent for downloading
-     * an image.
+     * Factory method that returns an Intent for downloading an image.
      */
     private Intent makeDownloadImageIntent(Uri url) {
         // Create an intent that will download the image from the web.
     	// TODO -- you fill in here, replacing "null" with the proper
     	// code.
-    	
-    	Intent intent = null;
-    	if (url != null){
-    		intent = new Intent();
-    		//set the context and the activity that will be created with this intent
-    		intent.setClass(getApplicationContext(), DownloadImageActivity.class);
-    		intent.setData(url);
-    	}
-    	
-        return intent;
+        Log.d(TAG, "*** makeDownloadImageIntent() ***" + url.toString());
+        Intent downloadImage = new Intent(Intent.ACTION_WEB_SEARCH);
+        downloadImage.setData(url);
+
+        return downloadImage;
     }
 
     /**
      * Get the URL to download based on user input.
      */
     protected Uri getUrl() {
-        Uri url = null;
 
         // Get the text the user typed in the edit text (if anything).
-        url = Uri.parse(mUrlEditText.getText().toString());
+        Uri url = Uri.parse(mUrlEditText.getText().toString());
 
         // If the user didn't provide a URL then use the default.
         String uri = url.toString();
         if (uri == null || uri.equals(""))
             url = mDefaultUrl;
 
-        
         // Do a sanity check to ensure the URL is valid, popping up a
         // toast if the URL is invalid.
         // @@ TODO -- you fill in here, replacing "true" with the
         // proper code.
-        boolean isValid = Patterns.WEB_URL.matcher(url.toString()).matches();
-        
-        if (isValid)
+        if (URLUtil.isValidUrl(url.toString()))
             return url;
         else {
             Toast.makeText(this,

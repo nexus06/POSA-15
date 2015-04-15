@@ -57,7 +57,8 @@ public abstract class LifecycleLoggingActivity extends Activity {
         // Always call super class for necessary
         // initialization/implementation.
         // TODO - you fill in here.
-    	super.onStart();
+        super.onStart();
+        Log.d(TAG, "*** activity onStart ***");
     }
 	
     /**
@@ -75,8 +76,8 @@ public abstract class LifecycleLoggingActivity extends Activity {
         // initialization/implementation and then log which lifecycle
         // hook method is being called.
         // TODO - you fill in here.
-    	super.onResume();
-    	Log.i(TAG, "Called onResume() method");
+        super.onResume();
+        Log.d(TAG, "*** activity onResume ***");
     }
 	
     /**
@@ -93,8 +94,8 @@ public abstract class LifecycleLoggingActivity extends Activity {
         // initialization/implementation and then log which lifecycle
         // hook method is being called.
         // TODO - you fill in here.
-    	super.onPause();
-    	Log.i(TAG, "Called onPause() method");
+        super.onPause();
+        Log.d(TAG, "*** activity onPause ***");
     }
 	
     /**
@@ -108,8 +109,8 @@ public abstract class LifecycleLoggingActivity extends Activity {
         // initialization/implementation and then log which lifecycle
         // hook method is being called.
         // TODO - you fill in here.
-    	super.onStop();
-    	Log.i(TAG, "Called onStop() method");
+        super.onStop();
+        Log.d(TAG, "*** activity onStop ***");
     }
 	
     /**
@@ -122,9 +123,8 @@ public abstract class LifecycleLoggingActivity extends Activity {
         // initialization/implementation and then log which lifecycle
         // hook method is being called.
         // TODO - you fill in here.
-    	super.onRestart();
-    	Log.i(TAG, "Called onRestart() method");
-    	
+        super.onRestart();
+        Log.d(TAG, "*** activity onRestart ***");
     }
 	
     /**
@@ -138,7 +138,7 @@ public abstract class LifecycleLoggingActivity extends Activity {
         // initialization/implementation and then log which lifecycle
         // hook method is being called.
         // TODO - you fill in here.
-    	super.onDestroy();
-    	Log.i(TAG, "Called onDestroy() method");
+        super.onDestroy();
+        Log.d(TAG, "*** activity onDestroy ***");
     }
 }
