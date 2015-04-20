@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.app.Activity;
+import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -28,9 +29,9 @@ public abstract class GenericImageActivity extends LifecycleLoggingActivity {
      * */
     private ProgressBar mLoadingProgressBar;
 
-    protected RetainedFragmentManager mRetainedFragmentManager = new RetainedFragmentManager(this, "genericActivityTag");
+    protected RetainedFragmentManager mRetainedFragmentManager = null;
     
-    /**constants in fragmentmanager**/
+    /**constants stored in retinedFragmentmanager**/
     private static String URI = "uri";
     private static String IMAGEPATH = "imagepath";
     private static String ASYNCTASk = "asynctask";
@@ -57,26 +58,32 @@ public abstract class GenericImageActivity extends LifecycleLoggingActivity {
         setContentView(R.layout.generic_image_activity);
         
         mLoadingProgressBar = (ProgressBar)findViewById(R.id.progress_loading);
+
+        mRetainedFragmentManager = new RetainedFragmentManager(this, TAG);
+        	
         
         if (mRetainedFragmentManager.firstTimeIn()){
         	//store the URL into RetainFragmentManager
         	mRetainedFragmentManager.put(URL, getIntent().getData());
-        	
+        	Log.d(TAG, "*** First time... ***");
         }else{
         	//retainedFragment was previously initialized,
         	//wich means that config change occoured,
         	//so obtain its data and figure out next steps
-        	Log.d(TAG, "Second time onCreate() " + (Uri)mRetainedFragmentManager.get(URL));
+        	
+        	Log.d(TAG, "Second time called onCreate() " + (Uri)mRetainedFragmentManager.get(URL));
         	
         	Uri pathToImage = (Uri) mRetainedFragmentManager.get(IMAGEPATH);
-        	
-        	
-        	
+        	if(pathToImage!=null){
+        		Log.d(TAG, "finishing the activity because result stored");
+        		Intent intentResult = new Intent();
+        		intentResult.setData(pathToImage);
+        		setResult(RESULT_OK, intentResult);
+        		finish();
+        	}else{
+        		Log.d(TAG, "Process is running");
+        	}
         }
-        
-        
-
-
     }
     
     @Override
@@ -135,15 +142,24 @@ public abstract class GenericImageActivity extends LifecycleLoggingActivity {
     	protected void onPostExecute(Uri result){
     		mRetainedFragmentManager.put(IMAGEPATH, result);
     		Log.d(TAG, "finish BG work");
-    		
-    		//TODO check id canceled
-    		Intent intentResult = new Intent();
-    		intentResult.setData(result);
-    		setResult(RESULT_OK, intentResult);
-    		GenericImageActivity.this.finish();
-    		
+    		if(result!=null){
+    			Intent intentResult = new Intent();
+        		intentResult.setData(result);
+        		setResult(RESULT_OK, intentResult);
+        		GenericImageActivity.this.finish();
+    		}else{
+    			Intent intentResult = new Intent();
+        		intentResult.setData(result);
+        		setResult(RESULT_CANCELED, intentResult);
+        		GenericImageActivity.this.finish();
+    		}
     	}
 
+    }
+    
+    public void downloadImage(View view){
+    	Utils.showToast(view.getContext(), "Download in preogress, please wait");
+    	
     }
 
 }

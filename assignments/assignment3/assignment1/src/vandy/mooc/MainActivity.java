@@ -9,8 +9,10 @@ import android.os.IBinder;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.URLUtil;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -22,7 +24,7 @@ import java.io.File;
  * then uses Intents and other Activities to download the image and
  * view it.
  */
-public class MainActivity extends LifecycleLoggingActivity {
+public class MainActivity extends LifecycleLoggingActivity implements OnClickListener{
     /**
      * Debugging tag used by the Android logger.
      */
@@ -39,6 +41,7 @@ public class MainActivity extends LifecycleLoggingActivity {
      * EditText field for entering the desired URL to an image.
      */
     private EditText mUrlEditText;
+    private Button downLoadButton;
 
     /**
      * URL for the image that's downloaded by default if the user
@@ -53,6 +56,8 @@ public class MainActivity extends LifecycleLoggingActivity {
     }
     
     private SparseArray<ResultCommand> mResultArray = new SparseArray<>();
+
+	private boolean mProcessButtonCLick = true;
 
     /**
      * Hook method called when a new instance of Activity is created.
@@ -75,6 +80,9 @@ public class MainActivity extends LifecycleLoggingActivity {
         // (if any).
         // @@ TODO -- you fill in here.
         mUrlEditText = (EditText) findViewById(R.id.url);
+        downLoadButton = (Button)findViewById(R.id.button1);
+        
+        downLoadButton.setOnClickListener(this);
         
         mResultArray.put(DOWNLOAD_IMAGE_REQUEST, new ResultCommand() {
 			
@@ -118,18 +126,19 @@ public class MainActivity extends LifecycleLoggingActivity {
 				final Intent intent = makeGalleryIntent(data.getDataString());
 				Log.d(TAG, "Gallery StartActivity() "+data.getDataString());
 				startActivity(intent);
+				mProcessButtonCLick = true;
 				
 			}
 		});
     }
+    
+    
 
     /**
      * Called by the Android Activity framework when the user clicks
      * the "Find Address" button.
-     *
-     * @param view The view.
      */
-    public void downloadImage(View view) {
+    public void downloadImage() {
         Log.d(TAG, "*** downloadImage() ***");
         try {
             // Hide the keyboard.
@@ -148,6 +157,7 @@ public class MainActivity extends LifecycleLoggingActivity {
             // downloaded image file via the onActivityResult() hook
             // method.
             // @@ TODO -- you fill in here.
+            mProcessButtonCLick = false;
             startActivityForResult(download, DOWNLOAD_IMAGE_REQUEST);
         } catch (Exception e) {
             e.printStackTrace();
@@ -179,7 +189,7 @@ public class MainActivity extends LifecycleLoggingActivity {
         else if (resultCode == Activity.RESULT_CANCELED) {
         	mResultArray.get(requestCode).printError(data);
         	//Allow user download image again
-        	//mProcessButtonCLick = true;
+        	mProcessButtonCLick  = true;
         }
     }    
 
@@ -221,13 +231,23 @@ public class MainActivity extends LifecycleLoggingActivity {
     /**
      * Factory method that returns an Intent for downloading an image.
      */
-    private Intent makeDownloadImageIntent(Uri url) {
+    private Intent makeDownloadImageIntent(Uri uri) {
         // Create an intent that will download the image from the web.
     	// TODO -- you fill in here, replacing "null" with the proper
     	// code.
-        Log.d(TAG, "*** makeDownloadImageIntent() ***" + url.toString());
-        Intent downloadImage = new Intent(DownloadImageActivity.DOWNLOAD_IMAGE_ACTION);
-        downloadImage.setData(url);
+    	Intent downloadImage = null;
+    	
+    	if(uri != null){
+    		if(mProcessButtonCLick){
+    			 Log.d(TAG, "*** makeDownloadImageIntent() ***" + uri.toString());
+    		     downloadImage = new Intent(DownloadImageActivity.DOWNLOAD_IMAGE_ACTION);
+    		     downloadImage.setData(uri);
+    		}else{
+    			Utils.showToast(this, "downloading in grogress");
+    		}
+    		
+    	}
+       
 
         return downloadImage;
     }
@@ -256,7 +276,7 @@ public class MainActivity extends LifecycleLoggingActivity {
                            "Invalid URL",
                            Toast.LENGTH_SHORT).show();
             return null;
-        } 
+        }
     }
 
     /**
@@ -271,4 +291,15 @@ public class MainActivity extends LifecycleLoggingActivity {
         mgr.hideSoftInputFromWindow(windowToken,
                                     0);
     }
+
+
+
+	@Override
+	public void onClick(View v) {
+		//downLoadButton.setOnClickListener(null);
+		if(mProcessButtonCLick){
+			downloadImage();	
+		}
+		
+	}
 }
