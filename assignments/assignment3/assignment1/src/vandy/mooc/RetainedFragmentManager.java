@@ -23,9 +23,11 @@ public class RetainedFragmentManager extends Fragment {
 	 
 	 private static final String TAG = RetainedFragmentManager.class.getName();
 
-	private Map<String, Object> mResultMap = new HashMap<>();
+	 private Map<String, Object> mResultMap = new HashMap<>();
 	 
 	 private boolean isFirstTime = true;
+
+	private RetainedFragmentManager instance;
 	 
 	 
 	 
@@ -38,26 +40,30 @@ public class RetainedFragmentManager extends Fragment {
 		    // retained across a configuration change.
 		    if (fm.findFragmentByTag(tag) == null) {
 		    	fm.beginTransaction().add(this, tag).commit();
-		    	isFirstTime = true;
+		    	instance = this;
+		    	instance.isFirstTime = true;
+		    	
 		    }else{
 		    	Log.d(TAG, "==retained fragment across change state==");
-		    	isFirstTime = false;
+		    	instance = (RetainedFragmentManager) fm.findFragmentByTag(tag);
+		    	instance.isFirstTime = false;
+		    	
 		    }
      	
      }
 
 	public Object get(String tag) {
-		return mResultMap.get(tag);
+		return instance.mResultMap.get(tag);
 	}
 	
 	
 
 	public void put(String tag, Object uri ) {
-		mResultMap.put(tag,  uri);
+		instance.mResultMap.put(tag,  uri);
 	}
 
 	public boolean firstTimeIn() {
-		return isFirstTime;
+		return instance.isFirstTime;
 	}
 	  /**
 	   * This method will only be called once when the retained

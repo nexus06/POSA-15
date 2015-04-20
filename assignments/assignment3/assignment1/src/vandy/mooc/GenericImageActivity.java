@@ -2,6 +2,7 @@ package vandy.mooc;
 
 import android.os.AsyncTask;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -81,7 +82,7 @@ public abstract class GenericImageActivity extends LifecycleLoggingActivity {
         		setResult(RESULT_OK, intentResult);
         		finish();
         	}else{
-        		Log.d(TAG, "Process is running");
+        		Log.d(TAG, "==Process is running yet==");
         	}
         }
     }
@@ -96,7 +97,9 @@ public abstract class GenericImageActivity extends LifecycleLoggingActivity {
     		Log.d(TAG, "onStart() creating and executing asyncTask");
     		mRetainedFragmentManager.put(ASYNCTASk, new GenericAsyncTask().execute((Uri)mRetainedFragmentManager.get(URL)));
     	}else{
+    		Log.d(TAG, "=================================");
     		Log.d(TAG, "onStart() NOT executing asyncTask");
+    		Log.d(TAG, "=================================");
     		
     	}
     	
@@ -105,7 +108,7 @@ public abstract class GenericImageActivity extends LifecycleLoggingActivity {
     }
     
     
-    public class GenericAsyncTask extends AsyncTask<Uri, Void, Uri> {
+    public class GenericAsyncTask extends AsyncTask<Uri, Integer, Uri> {
         /**
          * Debugging tag used by the Android logger.
          */
@@ -129,6 +132,10 @@ public abstract class GenericImageActivity extends LifecycleLoggingActivity {
 
         	Log.d(TAG, "onInBackground()");
         	Uri imgPath = null;
+        	for (int i = 0; !isCancelled() && i < 50; i++) {
+                SystemClock.sleep(100);
+                publishProgress(i);
+              }
         	try {
         		imgPath = doInBackgroundHook(GenericImageActivity.this, params[0]);        		
         	
@@ -137,6 +144,8 @@ public abstract class GenericImageActivity extends LifecycleLoggingActivity {
     		}
     		return imgPath;
     	}
+    	
+    	
     	
     	@Override
     	protected void onPostExecute(Uri result){
