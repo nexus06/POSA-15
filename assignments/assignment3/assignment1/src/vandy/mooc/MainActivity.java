@@ -36,6 +36,8 @@ public class MainActivity extends LifecycleLoggingActivity implements OnClickLis
      */
     final private static int DOWNLOAD_IMAGE_REQUEST = 1;
     final private static int FILTER_IMAGE_REQUEST = 2;
+
+	private static final String DOWNLOAD_STATE_STRING = "DOWNLOAD_STATE_TRING";
     
     /**
      * EditText field for entering the desired URL to an image.
@@ -76,12 +78,13 @@ public class MainActivity extends LifecycleLoggingActivity implements OnClickLis
         // Set the default layout.
         // @@ TODO -- you fill in here.
         setContentView(R.layout.main_activity);
+        
         // Cache the EditText that holds the urls entered by the user
         // (if any).
         // @@ TODO -- you fill in here.
         mUrlEditText = (EditText) findViewById(R.id.url);
         downLoadButton = (Button)findViewById(R.id.button1);
-        
+		
         downLoadButton.setOnClickListener(this);
         
         mResultArray.put(DOWNLOAD_IMAGE_REQUEST, new ResultCommand() {
